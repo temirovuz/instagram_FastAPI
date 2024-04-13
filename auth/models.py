@@ -45,3 +45,4 @@ def update_user(user_id, first_name, last_name, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).update({'first_name': first_name, 'last_name': last_name})
     db.commit()
     return user
+

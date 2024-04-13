@@ -1,19 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from starlette import status
 
-from auth.models import User
+from auth.models import User, create_user
 from auth.schemas import CreateUser, UpdateUser
 from core.database import get_db
 
 router = APIRouter()
 
 
-@router.post('/create')
-def create_user(user: CreateUser, db: Session = Depends(get_db)):
-    user = User(username=user.username, email=user.email, password=user.password)
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+@router.post('/signup', status_code=status.HTTP_201_CREATED)
+def create_users(user_data: CreateUser, db: Session = Depends(get_db)):
+    user = create_user(user_data.username, user_data.email, user_data.password, db)
     return user
 
 
