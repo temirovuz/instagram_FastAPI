@@ -15,3 +15,8 @@ class GetUser(BaseModel):
     first_name: str
     last_name: str
     signup_date: datetime
+
+
+class UpdateUser(BaseModel):
+    first_name: str
+    last_name: str
