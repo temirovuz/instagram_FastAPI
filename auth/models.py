@@ -22,8 +22,8 @@ class User(Base):
         return self.username
 
 
-def create_user(username, email, password, db: Session = Depends(get_db)):
-    user = User(username=username, email=email, password=password)
+def create_user(email, password, db: Session = Depends(get_db)):
+    user = User(email=email, password=password)
     db.add(user)
     db.commit()
     db.refresh(user)
