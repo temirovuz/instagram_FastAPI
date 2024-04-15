@@ -16,8 +16,7 @@ def signin(user_data: CreateUser, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == user_data.email).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found')
-    if not verify_password(user_data.password, user_data.password):
+    if not verify_password(user_data.password, user.password):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Invalid password')
-
-    access_token = crate_access_token(**user_data.dict())
+    access_token = crate_access_token(data={'user_id': user.id})
     return {'access_token': access_token, 'token_type': 'Bearer'}
