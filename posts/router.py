@@ -6,21 +6,22 @@ from sqlalchemy.orm import Session
 
 from auth.services import SECRET_KEY, ALGORITHM
 from core.database import get_db
+from core.services import check_token
 from posts.models import Post, create_post
-from posts.schemas import CreatePost
+from posts.schemas import CreatePost, UpdatePost
 
-router = APIRouter()
+router = APIRouter(prefix='/posts', tags=['posts'])
+
+
 
 
 @router.post('/create')
-def create_post_(post: CreatePost, db: Session = Depends(get_db), token: str = Depends()):
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get('sub')
-        if username is None:
-            raise HTTPException(status_code=401, detail='invalid Token')
-    except JWTError as e:
-        raise HTTPException(status_code=400, detail=f'{e}')
+def create_post_(post: CreatePost, db: Session = Depends(get_db), token: str = Depends):
+    check_user = check_token(token)
+    if check_user:
+        post = create_post(post.image, post.description, check_user, db)
+        return post
 
-    post = create_post(post.image, post.description, post.author, db)
-    return post
+@router.get('/update/{post_id}')
+def update_post(info: UpdatePost, post_id: int, db: Session = Depends(get_db), token: str = Depends):
+    pass

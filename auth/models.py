@@ -10,11 +10,11 @@ from core.utils import verify_password
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
+    first_name = Column(String(25), default=False)
+    last_name = Column(String(25), default=False)
     username = Column(String(20), unique=True)
     email = Column(String(50), unique=True)
     password = Column(String(50))
-    first_name = Column(String(25), default=False)
-    last_name = Column(String(25), default=False)
     signup_date = Column(DateTime(), server_default=now())
     is_active = Column(Boolean, default=False)
     is_admin = Column(Boolean, default=False)

@@ -45,6 +45,10 @@ def create_post(image_url, description, author, db: Session = Depends(get_db)):
     return post
 
 
+def update_post(post_if: int, description, db: Session = Depends(get_db)):
+    db.query(Post).filter(Post.description == description).update({'description': description})
+
+
 def create_comment(text: str, author: int, post_id: int, db: Session = Depends(get_db)):
     comment = Comment(text=text, post=post_id, author=author)
     db.add(comment)

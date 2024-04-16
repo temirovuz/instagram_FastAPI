@@ -6,7 +6,10 @@ from pydantic import BaseModel
 class CreatePost(BaseModel):
     image: str
     description: str
-    author: int
+
+
+class UpdatePost(BaseModel):
+    description: str
 
 
 class CreateComment(BaseModel):

@@ -1,47 +1,55 @@
 from fastapi import APIRouter, Depends, HTTPException
+from jose import jwt, JWTError
 from sqlalchemy.orm import Session
-from starlette import status
 
-from auth.models import User, create_user
-from auth.schemas import CreateUser, UpdateUser
+from auth.models import User
+from auth.schemas import UpdateUser, CreateUsername
+from auth.services import SECRET_KEY, ALGORITHM
 from core.database import get_db
+from core.services import check_token
 from core.utils import hash_password, verify_password
 
-router = APIRouter()
-
-
-@router.post('/signup', status_code=status.HTTP_201_CREATED)
-def create_users(user_data: CreateUser, db: Session = Depends(get_db)):
-    password = hash_password(user_data.password)
-    user = create_user(user_data.email, password, db)
-    return user
-
-
-# @router.post('/signin', status_code=status.HTTP_200_OK)
-# def login_user(user_data: CreateUser, db: Session = Depends(get_db)):
-#     user = db.query(User).filter(User.email == user_data.email).first()
-#     if not user:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found')
-#     if not verify_password(user_data.password, user_data.password):
-#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Incorrect password',)
-
-
-
-
-
+router = APIRouter(prefix="/user", tags=["user"])
 
 
 @router.get('/info')
 def get_user(username: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == username).first()
+    user = db.query(User).filter(User.email == username).first()
     if not user:
         raise HTTPException(status_code=404, detail='User not found')
     else:
         return user
 
 
-@router.post('/update')
-def user_update(user_id: int, user_data: UpdateUser, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).update(dict(user_data))
-    db.commit()
-    return user_data
+@router.post('/update/{id}')
+def user_update(user_data: UpdateUser, db: Session = Depends(get_db), token: str = Depends):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get('user_id')
+        if not email:
+            raise HTTPException(status_code=401, detail='invalid Token')
+        else:
+            db.query(User).filter(User.id == email).update(dict(user_data))
+            db.commit()
+            return {'message': 'User updated successfully'}
+    except JWTError:
+        raise HTTPException(status_code=400, detail='JWT Error')
+
+
+@router.post('/add_username')
+def add_username(username: CreateUsername, db: Session = Depends(get_db), token: str = Depends):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get('user_id')
+        if not email:
+            raise HTTPException(status_code=401, detail='invalid Token')
+        else:
+            user = db.query(User).filter(User.id == email).first()
+            if not user.username == username:
+                db.query(User).filter(User.id == email).update(dict(username))
+                db.commit()
+            else:
+                raise HTTPException(status_code=409, detail='Username already exists')
+            return {'message': 'Username added successfully'}
+    except JWTError:
+        raise HTTPException(status_code=400, detail='JWT Error')

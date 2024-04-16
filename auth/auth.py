@@ -3,12 +3,19 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from auth.schemas import Token, CreateUser
-from auth.models import User
+from auth.models import User, create_user
 from auth.services import crate_access_token
 from core.database import get_db
-from core.utils import verify_password
+from core.utils import verify_password, hash_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+@router.post('/signup', status_code=status.HTTP_201_CREATED)
+def create_users(user_data: CreateUser, db: Session = Depends(get_db)):
+    password = hash_password(user_data.password)
+    user = create_user(user_data.email, password, db)
+    return user
 
 
 @router.post('/signin', status_code=status.HTTP_200_OK, response_model=Token)

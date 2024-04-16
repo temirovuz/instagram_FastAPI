@@ -20,6 +20,9 @@ class UpdateUser(BaseModel):
     first_name: str
     last_name: str
 
+class CreateUsername(BaseModel):
+    username: str
+
 
 class Token(BaseModel):
     access_token: str
