@@ -37,8 +37,8 @@ class Like(Base):
     author = Column(Integer, ForeignKey('users.id'))
 
 
-def create_post(image, description, author, db: Session = Depends(get_db)):
-    post = Post(image=image, description=description, author=author)
+def create_post(image_url, description, author, db: Session = Depends(get_db)):
+    post = Post(image=image_url, description=description, author=author)
     db.add(post)
     db.commit()
     db.refresh(post)
