@@ -22,8 +22,8 @@ class User(Base):
         return self.username
 
 
-def create_user(username, email, password, db: Session = Depends(get_db)):
-    user = User(username=username, email=email, password=password)
+def create_user(email, password, db: Session = Depends(get_db)):
+    user = User(email=email, password=password)
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -45,3 +45,4 @@ def update_user(user_id, first_name, last_name, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).update({'first_name': first_name, 'last_name': last_name})
     db.commit()
     return user
+

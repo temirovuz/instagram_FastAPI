@@ -1,20 +1,34 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from starlette import status
 
-from auth.models import User
+from auth.models import User, create_user
 from auth.schemas import CreateUser, UpdateUser
 from core.database import get_db
+from core.utils import hash_password, verify_password
 
 router = APIRouter()
 
 
-@router.post('/create')
-def create_user(user: CreateUser, db: Session = Depends(get_db)):
-    user = User(username=user.username, email=user.email, password=user.password)
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+@router.post('/signup', status_code=status.HTTP_201_CREATED)
+def create_users(user_data: CreateUser, db: Session = Depends(get_db)):
+    password = hash_password(user_data.password)
+    user = create_user(user_data.email, password, db)
     return user
+
+
+# @router.post('/signin', status_code=status.HTTP_200_OK)
+# def login_user(user_data: CreateUser, db: Session = Depends(get_db)):
+#     user = db.query(User).filter(User.email == user_data.email).first()
+#     if not user:
+#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found')
+#     if not verify_password(user_data.password, user_data.password):
+#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Incorrect password',)
+
+
+
+
+
 
 
 @router.get('/info')

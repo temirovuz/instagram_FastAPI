@@ -157,8 +157,10 @@ cython_debug/
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
+# alembic filelar ham qoshildi ularni ommaga taqdim etish juda xato ish hisoblanadi
 .idea/
 alembic.ini
 database_addition.py
 migration/
+.gitignore
 instagram.db
