@@ -31,9 +31,5 @@ class Comment(Base):
 class Like(Base):
     __tablename__ = 'likes'
     id = Column(Integer, primary_key=True)
-    count = Column(Integer)
     post = Column(Integer, ForeignKey('posts.id'))
     author = Column(Integer, ForeignKey('users.id'))
-
-    def __repr__(self):
-        return self.count
