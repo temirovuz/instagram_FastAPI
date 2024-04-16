@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class CreatePost(BaseModel):
@@ -10,6 +10,21 @@ class CreatePost(BaseModel):
 
 class UpdatePost(BaseModel):
     description: str
+
+
+class UserOutput(BaseModel):
+    id: int
+    email: EmailStr
+    pub_date: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class PostOutput(BaseModel):
+    id: int
+    created: datetime
+    owner: UserOutput
 
 
 class CreateComment(BaseModel):

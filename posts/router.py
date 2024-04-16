@@ -3,25 +3,25 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
+from starlette import status
 
-from auth.services import SECRET_KEY, ALGORITHM
+from auth.services import SECRET_KEY, ALGORITHM, get_current_user
+from core import db
 from core.database import get_db
 from core.services import check_token
 from posts.models import Post, create_post
-from posts.schemas import CreatePost, UpdatePost
+from posts.schemas import CreatePost, UpdatePost, PostOutput, UserOutput
 
 router = APIRouter(prefix='/posts', tags=['posts'])
 
 
+@router.post('/create', status_code=status.HTTP_201_CREATED, response_model=PostOutput)
+def create_post(data: CreatePost, db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
+    new_post = Post(**data.dict(), author=user.id)
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
+    return new_post
 
 
-@router.post('/create')
-def create_post_(post: CreatePost, db: Session = Depends(get_db), token: str = Depends):
-    check_user = check_token(token)
-    if check_user:
-        post = create_post(post.image, post.description, check_user, db)
-        return post
 
-@router.get('/update/{post_id}')
-def update_post(info: UpdatePost, post_id: int, db: Session = Depends(get_db), token: str = Depends):
-    pass
