@@ -1,9 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Form
-from jose import jwt, JWTError
-from sqlalchemy.orm import Session
 
 from auth.models import User
-from auth.schemas import UpdateUser
 from auth.services import get_current_user
 from core.database import get_db
 from core.ultis import verify_password, hash_password
@@ -48,3 +45,10 @@ def update_fullname(last_name=Form(), first_name=Form(), db=Depends(get_db),
     db.query(User).filter(User.id == user.id).update({'first_name': first_name, 'last_name': last_name})
     db.commit()
     return {"message": "Fullname ozgartirildi"}
+
+
+@router.delete('/delete')
+def delete_user(user: UserOutput = Depends(get_current_user), db=Depends(get_db)):
+    db.query(User).filter(User.id == user.id).delete()
+    db.commit()
+    return {"message": "User deleted"}

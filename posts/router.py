@@ -9,7 +9,7 @@ from starlette import status
 from auth.services import get_current_user
 from core.database import get_db
 from posts.models import Post
-from posts.schemas import CreatePost, UpdatePost, PostOutput, UserOutput
+from posts.schemas import CreatePost, UpdatePost, UserOutput
 
 router = APIRouter(prefix='/post', tags=['post'])
 
@@ -52,7 +52,7 @@ def update_detail_post(post_id: int, data: UpdatePost, db=Depends(get_db),
 def delete_post(post_id: int, db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
     query = db.query(Post).filter(and_(Post.id == post_id, Post.author == user.id)).first()
     if not query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Post sizga tegishli')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Post sizga tegishli emas')
     db.query(Post).filter(Post.id == post_id).delete()
     db.commit()
 

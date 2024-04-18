@@ -21,12 +21,6 @@ class UserOutput(BaseModel):
         orm_mode = True
 
 
-class PostOutput(BaseModel):
-    id: int
-    created: datetime
-    owner: UserOutput
-
-
 class CreateComment(BaseModel):
     id: int
     text: str
@@ -36,6 +30,5 @@ class CreateComment(BaseModel):
 
 class CreateLike(BaseModel):
     id: int
-    count: int
     post: int
     author: int
