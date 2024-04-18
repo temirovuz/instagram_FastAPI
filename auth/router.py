@@ -43,7 +43,7 @@ def password_change(pwd=Form(), pwd2=Form(), user: UserOutput = Depends(get_curr
 
 
 @router.put("/update_fullname")
-def update_fullname(last_name=Form('Familiyangiz'), first_name=Form('Ismingiz'), db=Depends(get_db),
+def update_fullname(last_name=Form(), first_name=Form(), db=Depends(get_db),
                     user: UserOutput = Depends(get_current_user)):
     db.query(User).filter(User.id == user.id).update({'first_name': first_name, 'last_name': last_name})
     db.commit()
