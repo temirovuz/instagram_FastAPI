@@ -14,8 +14,10 @@ class UpdatePost(BaseModel):
 
 class UserOutput(BaseModel):
     id: int
+    first_name: str
+    last_name: str
     email: EmailStr
-    pub_date: datetime
+    signup_date: datetime
 
     class Config:
         orm_mode = True
