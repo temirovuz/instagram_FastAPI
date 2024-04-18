@@ -6,7 +6,7 @@ from auth.schemas import Token, CreateUser
 from auth.models import User, create_user
 from auth.services import crate_access_token
 from core.database import get_db
-from core.utils import verify_password, hash_password
+from core.ultis import verify_password, hash_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

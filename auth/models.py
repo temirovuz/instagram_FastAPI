@@ -1,7 +1,9 @@
+from fastapi import Depends, HTTPException
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import now
 
-from core.database import Base
+from core.database import Base, get_db
 
 
 class User(Base):
@@ -18,3 +20,15 @@ class User(Base):
 
     def __repr__(self):
         return self.username
+
+
+def create_user(email, password, db: Session = Depends(get_db)):
+    query = db.query(User).filter(User.email == email).first()
+    if not query:
+        user = User(email=email, password=password)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    else:
+        raise HTTPException(status_code=409, detail='Email already registered')
+    return user
