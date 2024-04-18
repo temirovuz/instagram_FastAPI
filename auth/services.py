@@ -11,10 +11,10 @@ from core.database import get_db
 
 SECRET_KEY = 'test'
 ALGORITHM = 'HS256'
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 100000000
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl='auth/signin'
+    tokenUrl='auth/login'
 )
 
 
