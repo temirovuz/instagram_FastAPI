@@ -25,10 +25,11 @@ class User(Base):
 class Follower(Base):
     __tablename__ = 'followers'
     id = Column(Integer, primary_key=True)
-    following_id = Column(Integer, ForeignKey('users.id'))
-    follower_id = Column(Integer, ForeignKey('users.id'))
-    follower = relationship('User', backref='followers')
-    following = relationship('User', backref='followings')
+    obunalar_id = Column(Integer, ForeignKey('users.id'))
+    obunachilar_id = Column(Integer, ForeignKey('users.id'))
+    status = Column(String, default="pending")
+    obunachilar = relationship('User', foreign_keys=[obunachilar_id],backref='obunachilarim')
+    obunalar = relationship('User', foreign_keys=[obunalar_id], backref='obunalarim')
 
 
 def create_user(email, password, db: Session = Depends(get_db)):
