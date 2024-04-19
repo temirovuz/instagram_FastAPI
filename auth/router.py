@@ -14,7 +14,7 @@ def info_user(db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
     return db.query(User).filter(User.id == user.id).first()
 
 
-@router.post("/update_username")
+@router.put("/update_username")
 def add_username(data=Form(), user: UserOutput = Depends(get_current_user), db=Depends(get_db)):
     username = db.query(User).filter(User.username == data.lower()).first()
     if username:

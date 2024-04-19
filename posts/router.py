@@ -9,29 +9,29 @@ from starlette import status
 from auth.services import get_current_user
 from core.database import get_db
 from posts.models import Post
-from posts.schemas import CreatePost, UpdatePost, UserOutput
+from posts.schemas import CreatePost, UpdatePost, UserOutput, PostOutputAll
 
 router = APIRouter(prefix='/post', tags=['post'])
 
 
 @router.post('/create', status_code=status.HTTP_200_OK)
 def create_post(data: CreatePost, db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
-    new_post = Post(**data.dict(), author=user.id)
+    new_post = Post(**data.dict(), author_id=user.id)
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
     return new_post
 
 
-@router.get('/list', status_code=status.HTTP_200_OK)
+@router.get('/list', status_code=status.HTTP_200_OK, response_model=List[PostOutputAll])
 def list_posts(db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
-    posts = db.query(Post).filter(Post.author == user.id).all()
+    posts = db.query(Post).filter(Post.author_id == user.id).all()
     return posts
 
 
-@router.get('/{id}', status_code=status.HTTP_200_OK)
+@router.get('/{id}', status_code=status.HTTP_200_OK, response_model=List[PostOutputAll])
 def detail_post(post_id: int, db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
-    post = db.query(Post).filter(and_(Post.author == user.id, Post.id == post_id)).first()
+    post = db.query(Post).filter(and_(Post.author_id == user.id, Post.id == post_id)).first()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Post sizga tegishli emas')
     return post
@@ -40,7 +40,7 @@ def detail_post(post_id: int, db=Depends(get_db), user: UserOutput = Depends(get
 @router.put('/{id}', status_code=status.HTTP_200_OK)
 def update_detail_post(post_id: int, data: UpdatePost, db=Depends(get_db),
                        user: UserOutput = Depends(get_current_user)):
-    query = db.query(Post).filter(and_(Post.author == user.id, Post.id == post_id)).first()
+    query = db.query(Post).filter(and_(Post.author_id == user.id, Post.id == post_id)).first()
     if not query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Post sizga tegishli emas')
     db.query(Post).filter(Post.id == post_id).update(data.dict())
@@ -50,7 +50,7 @@ def update_detail_post(post_id: int, data: UpdatePost, db=Depends(get_db),
 
 @router.delete('/{id}', status_code=status.HTTP_200_OK)
 def delete_post(post_id: int, db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
-    query = db.query(Post).filter(and_(Post.id == post_id, Post.author == user.id)).first()
+    query = db.query(Post).filter(and_(Post.id == post_id, Post.author_id == user.id)).first()
     if not query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Post sizga tegishli emas')
     db.query(Post).filter(Post.id == post_id).delete()

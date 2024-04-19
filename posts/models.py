@@ -1,6 +1,6 @@
 from fastapi import Depends
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 from sqlalchemy.sql.functions import now
 
 from core.database import Base, get_db
@@ -12,7 +12,8 @@ class Post(Base):
     image = Column(String)
     description = Column(String)
     pub_date = Column(DateTime(), server_default=now())
-    author = Column(Integer, ForeignKey('users.id'))
+    author_id = Column(Integer, ForeignKey('users.id'))
+    author = relationship('User', backref='posts')
 
     def __repr__(self):
         return self.description
@@ -23,8 +24,10 @@ class Comment(Base):
     id = Column(Integer, primary_key=True)
     text = Column(String)
     created = Column(DateTime(), server_default=now())
-    post = Column(Integer, ForeignKey('posts.id'))
-    author = Column(Integer, ForeignKey('users.id'))
+    post_id = Column(Integer, ForeignKey('posts.id'))
+    author_id = Column(Integer, ForeignKey('users.id'))
+    post = relationship('Post', backref='comments')
+    author = relationship('User', backref='comments')
 
     def __repr__(self):
         return self.text
@@ -33,12 +36,13 @@ class Comment(Base):
 class Like(Base):
     __tablename__ = 'likes'
     id = Column(Integer, primary_key=True)
-    post = Column(Integer, ForeignKey('posts.id'))
-    author = Column(Integer, ForeignKey('users.id'))
-
+    post_id = Column(Integer, ForeignKey('posts.id'))
+    author_id = Column(Integer, ForeignKey('users.id'))
+    post = relationship('Post', backref='likes')
+    author = relationship('User', backref='likes')
 
 def create_post(image_url, description, author, db: Session = Depends(get_db)):
-    post = Post(image=image_url, description=description, author=author)
+    post = Post(image=image_url, description=description, author_id=author)
     db.add(post)
     db.commit()
     db.refresh(post)
@@ -50,7 +54,7 @@ def update_post(post_if: int, description, db: Session = Depends(get_db)):
 
 
 def create_comment(text: str, author: int, post_id: int, db: Session = Depends(get_db)):
-    comment = Comment(text=text, post=post_id, author=author)
+    comment = Comment(text=text, post_id=post_id, author_id=author)
     db.add(comment)
     db.commit()
     db.refresh(comment)

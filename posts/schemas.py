@@ -3,9 +3,33 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr
 
 
+class CreateComment(BaseModel):
+    text: str
+    post_id: int
+
+
+class CommentOutput(BaseModel):
+    id: int
+    text: str
+    created: datetime
+
+
 class CreatePost(BaseModel):
     image: str
     description: str
+
+
+class PostOutput(BaseModel):
+    id: int
+    image: str
+    description: str
+    pub_date: datetime
+    # author: int
+
+
+class PostOutputAll(CreatePost):
+    id: int
+    comments: list[CommentOutput]
 
 
 class UpdatePost(BaseModel):
@@ -23,14 +47,5 @@ class UserOutput(BaseModel):
         orm_mode = True
 
 
-class CreateComment(BaseModel):
-    id: int
-    text: str
-    author: int
-    post: int
-
-
 class CreateLike(BaseModel):
-    id: int
-    post: int
-    author: int
+    post_id: int
