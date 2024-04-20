@@ -30,5 +30,16 @@ class Token(BaseModel):
     token_type: str
 
 
-class Follow(BaseModel):
+class FollowerSchema(BaseModel):
     id: int
+    obunachilar_id: int
+
+    class Config:
+        orm_mode = True
+
+class FollowingSchema(BaseModel):
+    id: int
+    obunalar_id: int
+
+    class Config:
+        orm_mode = True

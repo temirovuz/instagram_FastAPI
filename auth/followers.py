@@ -5,6 +5,7 @@ from auth.services import get_current_user
 from core.database import get_db
 from .models import Follower, User
 from posts.schemas import UserOutput
+from .schemas import FollowerSchema, FollowingSchema
 
 router = APIRouter(prefix="/followers", tags=["followers"])
 
@@ -25,7 +26,7 @@ def add_following(user_id=Form(), db=Depends(get_db), user: UserOutput = Depends
     return followings
 
 
-@router.get("/kuzatuvchilar")
+@router.get("/kuzatuvchilar", status_code=200, response_model=list[FollowerSchema])
 def get_follower(db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
     followers = db.query(Follower).filter(and_(Follower.obunachilar_id == user.id, Follower.status == 'accepted')).all()
     return followers
@@ -37,7 +38,7 @@ def get_following(db=Depends(get_db), user: UserOutput = Depends(get_current_use
     return followings
 
 
-@router.get('/kuzatish_sorovi')
+@router.get('/kuzatish_sorovi', status_code=200, response_model=list[FollowingSchema])
 def get_followings_request(db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
     query = db.query(Follower).filter(and_(Follower.obunachilar_id == user.id, Follower.status == 'pending')).all()
     return query
@@ -73,7 +74,7 @@ def follower_reject(follower_id, db=Depends(get_db), user: UserOutput = Depends(
 
 @router.post("/obunamni/{follower_id}/bekor_qilish")
 def follower_cancel(follower_id, db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
-    query = db.query(Follower).filter(and_(Follower.id == follower_id, Follower.obunalar_id == user.id)).first()
+    query = db.query(Follower).filter(and_(Follower.id == follower_id, Follower.obunachilar_id == user.id)).first()
     if not query:
         raise HTTPException(status_code=404, detail="Bunday sorov topilmadi")
     db.query(Follower).filter(Follower.id == follower_id).delete()
