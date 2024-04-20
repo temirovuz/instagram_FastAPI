@@ -26,13 +26,13 @@ def add_following(user_id=Form(), db=Depends(get_db), user: UserOutput = Depends
     return followings
 
 
-@router.get("/kuzatuvchilar", status_code=200, response_model=list[FollowerSchema])
+@router.get("/kuzatishlar", status_code=200, response_model=list[FollowerSchema])
 def get_follower(db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
     followers = db.query(Follower).filter(and_(Follower.obunachilar_id == user.id, Follower.status == 'accepted')).all()
     return followers
 
 
-@router.get("/kuzatishlar")
+@router.get("/kuzatuvchilar")
 def get_following(db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
     followings = db.query(Follower).filter(and_(Follower.obunalar_id == user.id, Follower.status == 'accepted')).all()
     return followings

@@ -28,7 +28,7 @@ class Follower(Base):
     obunalar_id = Column(Integer, ForeignKey('users.id'))
     obunachilar_id = Column(Integer, ForeignKey('users.id'))
     status = Column(String, default="pending")
-    obunachilar = relationship('User', foreign_keys=[obunachilar_id],backref='obunachilarim')
+    obunachilar = relationship('User', foreign_keys=[obunachilar_id], backref='obunachilarim')
     obunalar = relationship('User', foreign_keys=[obunalar_id], backref='obunalarim')
 
 

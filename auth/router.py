@@ -9,7 +9,7 @@ from posts.schemas import UserOutput
 router = APIRouter(prefix="/user", tags=["user"])
 
 
-@router.post("/info", status_code=200, response_model=UserOutput)
+@router.get("/info", status_code=200, response_model=UserOutput)
 def info_user(db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
     return db.query(User).filter(User.id == user.id).first()
 
