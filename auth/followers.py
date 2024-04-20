@@ -10,14 +10,15 @@ router = APIRouter(prefix="/followers", tags=["followers"])
 
 
 @router.post("/obuna_bolish")
-def add_following(following_id=Form(), db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
-    users = db.query(User).filter(User.id == following_id).first()
+def add_following(user_id=Form(), db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
+    users = db.query(User).filter(User.id == user_id).first()
     if not users:
         raise HTTPException(status_code=404, detail="User topilmadi")
-    following = db.query(Follower).filter(and_(Follower.obunalar_id == user.id, User.id == following_id)).first()
+    following = db.query(Follower).filter(
+        and_(Follower.obunachilar_id == user.id, Follower.obunalar_id == user_id)).first()
     if following:
         raise HTTPException(status_code=409, detail="Siz oldin sorov yuborgansiz")
-    followings = Follower(obunalar_id=following_id, obunachilar_id=user.id)
+    followings = Follower(obunalar_id=user_id, obunachilar_id=user.id)
     db.add(followings)
     db.commit()
     db.refresh(followings)
@@ -53,8 +54,8 @@ def follower_accept(follower_id, db=Depends(get_db), user: UserOutput = Depends(
     query = db.query(Follower).filter(
         and_(Follower.id == follower_id, Follower.obunalar_id == user.id)).first()
     if not query:
-        raise HTTPException(status_code=404, detail="User topilmadi")
-    db.query(Follower).filter(Follower.obunalar_id == follower_id).update({"status": "accepted"})
+        raise HTTPException(status_code=404, detail="Bunday sorov topilmadi")
+    db.query(Follower).filter(Follower.id == follower_id).update({"status": "accepted"})
     db.commit()
     return {'message': 'Follower Accepted'}
 
@@ -64,17 +65,17 @@ def follower_reject(follower_id, db=Depends(get_db), user: UserOutput = Depends(
     query = db.query(Follower).filter(
         and_(Follower.id == follower_id, Follower.obunalar_id == user.id)).first()
     if not query:
-        raise HTTPException(status_code=404, detail="User topilmadi")
-    db.query(Follower).filter(Follower.obunalar_id == follower_id).update({"status": "rejected"})
+        raise HTTPException(status_code=404, detail="Bunday sorov topilmadi")
+    db.query(Follower).filter(Follower.id == follower_id).delete()
     db.commit()
     return {'message': 'Follower rejected'}
 
 
 @router.post("/obunamni/{follower_id}/bekor_qilish")
 def follower_cancel(follower_id, db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
-    query = db.query(Follower).filter(and_(Follower.id == follower_id, Follower.obunachilar_id == user.id)).first()
+    query = db.query(Follower).filter(and_(Follower.id == follower_id, Follower.obunalar_id == user.id)).first()
     if not query:
-        raise HTTPException(status_code=404, detail="User topilmadi")
-    db.query(Follower).filter(Follower.id == follower_id).update({"status": "canceled"})
+        raise HTTPException(status_code=404, detail="Bunday sorov topilmadi")
+    db.query(Follower).filter(Follower.id == follower_id).delete()
     db.commit()
     return {'message': 'Follower request Canceled'}
