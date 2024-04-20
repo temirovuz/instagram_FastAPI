@@ -2,22 +2,22 @@
 
 ___
 
-* Git clone project
-* A virtual environment is created
-* Installing requirements.txt
+* **Git clone project**
+* **A virtual environment is created**
+* **Installing requirements.txt**
 
         pip install -r requirements.txtv
-* Alembic init
+* **Alembic init**
 
         alembic init migrations
-* env.py files database url is given
-* Alembic migrations
+* **env.py files database url is given**
+* **Alembic migrations**
 
         alembic revision --autogenerate -m "Create tables"
-* Alembic upgrade
+* **Alembic upgrade**
 
         alembic upgrade head
-* Let's launch the project
+* **Let's launch the project**
 
          uvicorn main:app --reload
 
