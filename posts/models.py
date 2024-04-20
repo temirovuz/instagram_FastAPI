@@ -41,6 +41,32 @@ class Like(Base):
     post = relationship('Post', backref='likes')
     author = relationship('User', backref='likes')
 
+
+
+
+
+
+class Room(Base):
+    __tablename__ = 'rooms'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(25), unique=True)
+    created = Column(DateTime(), default=now)
+
+
+class Message(Base):
+    __tablename__ = 'messages'
+    id = Column(Integer, primary_key=True)
+    room_id = Column(Integer, ForeignKey('rooms.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    content = Column(String, nullable=False)
+    created = Column(DateTime(), default=now)
+    room = relationship('Room', backref='messages')
+    user = relationship('User', backref='messages')
+
+
+
+
+
 def create_post(image_url, description, author, db: Session = Depends(get_db)):
     post = Post(image=image_url, description=description, author_id=author)
     db.add(post)
