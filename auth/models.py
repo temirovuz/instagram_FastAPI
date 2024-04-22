@@ -42,3 +42,8 @@ def create_user(email, password, db: Session = Depends(get_db)):
     else:
         raise HTTPException(status_code=409, detail='Email already registered')
     return user
+
+
+def get_user(user_id, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    return user if user else False

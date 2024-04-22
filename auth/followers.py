@@ -3,7 +3,8 @@ from sqlalchemy import and_
 
 from auth.services import get_current_user
 from core.database import get_db
-from .models import Follower, User
+from .follower_CRUD import follower_add
+from .models import Follower, User, get_user
 from posts.schemas import UserOutput
 from .schemas import FollowerSchema, FollowingSchema
 
@@ -12,17 +13,14 @@ router = APIRouter(prefix="/followers", tags=["followers"])
 
 @router.post("/obuna_bolish")
 def add_following(user_id=Form(), db=Depends(get_db), user: UserOutput = Depends(get_current_user)):
-    users = db.query(User).filter(User.id == user_id).first()
+    users = get_user(user_id, db)
     if not users:
         raise HTTPException(status_code=404, detail="User topilmadi")
     following = db.query(Follower).filter(
         and_(Follower.obunachilar_id == user.id, Follower.obunalar_id == user_id)).first()
     if following:
         raise HTTPException(status_code=409, detail="Siz oldin sorov yuborgansiz")
-    followings = Follower(obunalar_id=user_id, obunachilar_id=user.id)
-    db.add(followings)
-    db.commit()
-    db.refresh(followings)
+    followings = follower_add(user_id, user.id, db)
     return followings
 
 
