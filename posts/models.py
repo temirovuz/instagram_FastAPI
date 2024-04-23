@@ -42,10 +42,6 @@ class Like(Base):
     author = relationship('User', backref='likes')
 
 
-
-
-
-
 class Room(Base):
     __tablename__ = 'rooms'
     id = Column(Integer, primary_key=True)
@@ -62,9 +58,6 @@ class Message(Base):
     created = Column(DateTime(), default=now)
     room = relationship('Room', backref='messages')
     user = relationship('User', backref='messages')
-
-
-
 
 
 def create_post(image_url, description, author, db: Session = Depends(get_db)):
