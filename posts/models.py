@@ -46,7 +46,7 @@ class Room(Base):
     __tablename__ = 'rooms'
     id = Column(Integer, primary_key=True)
     name = Column(String(25), unique=True)
-    created = Column(DateTime(), default=now)
+    created = Column(DateTime(), default=now())
 
 
 class Message(Base):
@@ -55,7 +55,7 @@ class Message(Base):
     room_id = Column(Integer, ForeignKey('rooms.id'), nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     content = Column(String, nullable=False)
-    created = Column(DateTime(), default=now)
+    created = Column(DateTime, default=now)
     room = relationship('Room', backref='messages')
     user = relationship('User', backref='messages')
 

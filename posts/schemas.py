@@ -49,3 +49,12 @@ class UserOutput(BaseModel):
 
 class CreateLike(BaseModel):
     post_id: int
+
+
+class RoomCreate(BaseModel):
+    name: str
+
+
+class RoomOutput(RoomCreate):
+    id: int
+    created: datetime
