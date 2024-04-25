@@ -1,14 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import or_
+from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import current_user
 from starlette import status
 from starlette.websockets import WebSocket
 
 from auth.models import User
-from auth.services import get_current_user
+from auth.services import get_current_user, verify_access_token
 from core import database
 from core.database import get_db
-from posts.models import Room
+from posts.models import Room, Message
 from posts.schemas import RoomCreate, RoomOutput
 
 router = APIRouter(prefix="/chats", tags=["chats"])
@@ -44,5 +45,23 @@ def get_rooms(current_user: User = Depends(get_current_user), db=Depends(get_db)
 
 
 @router.websocket('/room/{room_id}/message')
-def create_message(room_id: int, websocket: WebSocket):
-    pass
+async def create_message(room_id: int, websocket: WebSocket, db: Session=Depends(get_db)):
+    await websocket.accept()
+    token = websocket.headers['Authorization'].split(' ')[1]
+    user_id = verify_access_token(token)
+    room = db.query(Room).filter(Room.id == room_id).first()
+    if not room:
+        await websocket.close()
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Room not found')
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            print('info data',data)
+            message = Message(room_id=room_id, user_id=user_id, content=data)
+            db.add(message)
+            db.commit()
+            db.refresh(message)
+            await websocket.send_text(data)
+    except:
+        await websocket.close()
