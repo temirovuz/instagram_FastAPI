@@ -22,7 +22,6 @@ def create_users(user_data: CreateUser, db: Session = Depends(get_db)):
 @router.post("/login", status_code=200, response_model=Token)
 def login(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     query = db.query(User).filter(User.email == user.username).first()
-
     if not query:
         raise HTTPException(status_code=409, detail="Incorrect email")
     if not verify_password(user.password, query.password):
