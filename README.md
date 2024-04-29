@@ -23,7 +23,7 @@ ___
 
 
 
-### Thank you all [Temirovuz](https://github.com/temirovuz) was with you 🙂
+### Thank you all [Temirovuz](https://github.com/temirovuz) was with you 🙂.
 ___
 
 ![image](https://github.com/temirovuz/news_FastAPI/assets/100820263/ad07393e-59de-4374-83af-3fd6987a7b27)
