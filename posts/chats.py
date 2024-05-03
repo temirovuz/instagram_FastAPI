@@ -1,13 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
-from sqlalchemy.sql.functions import current_user
 from starlette import status
 from starlette.websockets import WebSocket
 
 from auth.models import User
 from auth.services import get_current_user, verify_access_token
-from core import database
 from core.database import get_db
 from posts.models import Room, Message
 from posts.schemas import RoomCreate, RoomOutput
