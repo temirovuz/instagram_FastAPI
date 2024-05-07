@@ -55,5 +55,4 @@ def delete_post(post_id: int, db=Depends(get_db), user: UserOutput = Depends(get
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Post sizga tegishli emas')
     db.query(Post).filter(Post.id == post_id).delete()
     db.commit()
-
     return {'message': f'Post  deleted.'}
